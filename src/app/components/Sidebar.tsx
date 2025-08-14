@@ -100,7 +100,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                                     }`}
                             >
                                 <div className="mb-1">
-                                    {item.icon(window?.innerWidth < 640 ? 20 : 24)}
+                                    {/* dont use window inner width */}
+                                    {
+                                        item.icon(24)
+                                    }
                                 </div>
                                 <span className="text-[10px] font-medium text-center leading-tight">
                                     {item.label}
