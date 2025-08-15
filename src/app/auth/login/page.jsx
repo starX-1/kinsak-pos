@@ -56,26 +56,38 @@ const LoginPage = () => {
   const handleLogin = async () => {
     if (!validateLogin()) return;
 
-    const response = await signIn('credentials', {
+    const response = await signIn("credentials", {
       name: loginForm.username,
       password: loginForm.password,
       redirect: false,
     });
-    console.log(response);
+
+    console.log("SignIn response:", response);
 
     if (response?.error) {
-      setErrors({ general: 'Invalid username or password' });
-    } else {
-      setIsLoading(true);
-      // Simulate API call
-      setTimeout(() => {
-        setIsLoading(false);
-        const user = getSession();
-        console.log(user);
-        // Handle successful login here
-      }, 2000);
+      setErrors({ general: "Invalid username or password" });
+      return;
     }
+
+    setIsLoading(true);
+
+    // Wait for NextAuth to store session before fetching it
+    setTimeout(async () => {
+      setIsLoading(false);
+
+      const session = await getSession();
+      // console.log("Session:", session);
+
+      if (session?.user?.role === "ADMIN") {
+        router.push("/dashboard");
+      } else if (session?.user?.role === "WAITER") {
+        router.push("/dashboard");
+      } else {
+        router.push("/"); // fallback page
+      }
+    }, 500); // short delay to ensure session is saved
   };
+
 
   const handleRegisterRedirect = () => {
     router.push('/auth/register')

@@ -8,7 +8,6 @@ const api = axios.create({
 
 const authUrl = "/api/auth/login";
 
-// NextAuth options
 const authOptions = {
     providers: [
         CredentialsProvider({
@@ -24,15 +23,15 @@ const authOptions = {
                         password: credentials.password,
                     });
 
-                    const loginData = data?.data;
-
-                    // console.log(loginData);
-
-                    if (loginData && loginData.token) {
-                        // Return the full user + tokens
+                    // ✅ The API response
+                    if (data?.token && data?.user) {
+                        // Return both token & user to NextAuth
                         return {
+                            token: data.token,
+                            user: data.user,
                         };
                     }
+
                     return null;
                 } catch (error) {
                     console.error("Login error:", error.response?.data || error.message);
@@ -50,14 +49,12 @@ const authOptions = {
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
-                // Store everything in token
-                token.user = user.user; // The actual user object
-                token.token = user.token;
+                token.user = user.user;   // Store user details
+                token.token = user.token; // Store API token
             }
             return token;
         },
         async session({ session, token }) {
-            // Attach everything to session
             session.user = token.user;
             session.token = token.token;
             return session;

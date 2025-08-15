@@ -193,7 +193,7 @@ const RegisterPage = () => {
                         </div>
 
                         {/* Restaurant Name */}
-                        <div>
+                        {/* <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">
                                 Restaurant Name
                             </label>
@@ -217,10 +217,10 @@ const RegisterPage = () => {
                                     {errors.restaurantName}
                                 </div>
                             )}
-                        </div>
+                        </div> */}
 
                         {/* Phone */}
-                        <div>
+                        {/* <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">
                                 Phone Number
                             </label>
@@ -244,7 +244,7 @@ const RegisterPage = () => {
                                     {errors.phone}
                                 </div>
                             )}
-                        </div>
+                        </div> */}
 
                         {/* Password */}
                         <div>
