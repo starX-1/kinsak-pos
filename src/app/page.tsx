@@ -73,14 +73,14 @@ const LandingPage = () => {
       name: "James Chen",
       role: "Manager, Urban Bistro",
       image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face",
-      content: "The analytics dashboard gives us insights we never had before. We've increased our efficiency by 40% since switching.",
+      content: "The analytics dashboard gives us insights we never had before. We have increased our efficiency by 40% since switching.",
       rating: 5
     },
     {
       name: "Sarah Johnson",
       role: "Owner, Café Dreams",
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face",
-      content: "Customer service is exceptional and the system is incredibly reliable. It's been a game-changer for our business.",
+      content: "Customer service is exceptional and the system is incredibly reliable. It has been a game-changer for our business.",
       rating: 5
     }
   ];
@@ -226,7 +226,7 @@ const LandingPage = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
                       <div className="text-yellow-400 text-2xl font-bold">$12,450</div>
-                      <div className="text-gray-300 text-sm">Today's Revenue</div>
+                      <div className="text-gray-300 text-sm">Today&apos;s Revenue</div>
                     </div>
                     <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
                       <div className="text-green-400 text-2xl font-bold">147</div>
