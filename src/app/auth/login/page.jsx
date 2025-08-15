@@ -1,24 +1,26 @@
 'use client'
 import React, { useState } from 'react';
-import { 
-  Eye, 
-  EyeOff, 
-  Mail, 
-  Lock, 
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
   AlertCircle,
   Chrome,
   Apple,
   Cloud,
-  Shield
+  Shield,
+  User
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getSession, signIn } from 'next-auth/react';
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const [loginForm, setLoginForm] = useState({
-    email: '',
+    name: '',
     password: '',
     rememberMe: false
   });
@@ -39,31 +41,40 @@ const LoginPage = () => {
 
   const validateLogin = () => {
     const newErrors = {};
-    
-    if (!loginForm.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(loginForm.email)) {
-      newErrors.email = 'Please enter a valid email';
+
+    if (!loginForm.username) {
+      newErrors.username = 'Username is required';
     }
-    
     if (!loginForm.password) {
       newErrors.password = 'Password is required';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleLogin = async () => {
     if (!validateLogin()) return;
-    
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log('Login attempt:', loginForm);
-      // Handle successful login here
-    }, 2000);
+
+    const response = await signIn('credentials', {
+      name: loginForm.username,
+      password: loginForm.password,
+      redirect: false,
+    });
+    console.log(response);
+
+    if (response?.error) {
+      setErrors({ general: 'Invalid username or password' });
+    } else {
+      setIsLoading(true);
+      // Simulate API call
+      setTimeout(() => {
+        setIsLoading(false);
+        const user = getSession();
+        console.log(user);
+        // Handle successful login here
+      }, 2000);
+    }
   };
 
   const handleRegisterRedirect = () => {
@@ -87,30 +98,35 @@ const LoginPage = () => {
         {/* Login Form */}
         <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-8 shadow-2xl">
           <div className="space-y-6">
-            {/* Email Field */}
+            {errors.general && (
+              <div className="flex items-center mt-1 text-red-400 text-sm">
+                <AlertCircle size={16} className="mr-1" />
+                {errors.general}
+              </div>
+            )}
+            {/* Username Field */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Email Address
+                Username
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                 <input
-                  type="email"
-                  name="email"
-                  value={loginForm.email}
+                  type="text"
+                  name="username"
+                  value={loginForm.username}
                   onChange={handleLoginChange}
-                  className={`w-full pl-10 pr-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${
-                    errors.email 
-                      ? 'border-red-500 focus:ring-red-500/50' 
-                      : 'border-white/20 focus:ring-yellow-400/50 focus:border-yellow-400/50'
-                  }`}
-                  placeholder="Enter your email"
+                  className={`w-full pl-10 pr-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${errors.username
+                    ? 'border-red-500 focus:ring-red-500/50'
+                    : 'border-white/20 focus:ring-yellow-400/50 focus:border-yellow-400/50'
+                    }`}
+                  placeholder="Enter your username"
                 />
               </div>
-              {errors.email && (
+              {errors.username && (
                 <div className="flex items-center mt-1 text-red-400 text-sm">
                   <AlertCircle size={16} className="mr-1" />
-                  {errors.email}
+                  {errors.username}
                 </div>
               )}
             </div>
@@ -127,11 +143,10 @@ const LoginPage = () => {
                   name="password"
                   value={loginForm.password}
                   onChange={handleLoginChange}
-                  className={`w-full pl-10 pr-12 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${
-                    errors.password 
-                      ? 'border-red-500 focus:ring-red-500/50' 
-                      : 'border-white/20 focus:ring-yellow-400/50 focus:border-yellow-400/50'
-                  }`}
+                  className={`w-full pl-10 pr-12 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${errors.password
+                    ? 'border-red-500 focus:ring-red-500/50'
+                    : 'border-white/20 focus:ring-yellow-400/50 focus:border-yellow-400/50'
+                    }`}
                   placeholder="Enter your password"
                 />
                 <button
@@ -171,11 +186,10 @@ const LoginPage = () => {
             <button
               onClick={handleLogin}
               disabled={isLoading}
-              className={`w-full py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2 ${
-                isLoading
-                  ? 'bg-gray-600 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-yellow-400 to-orange-500 hover:shadow-lg hover:shadow-orange-500/25 transform hover:scale-[1.02]'
-              } text-white`}
+              className={`w-full py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2 ${isLoading
+                ? 'bg-gray-600 cursor-not-allowed'
+                : 'bg-gradient-to-r from-yellow-400 to-orange-500 hover:shadow-lg hover:shadow-orange-500/25 transform hover:scale-[1.02]'
+                } text-white`}
             >
               {isLoading ? (
                 <>
