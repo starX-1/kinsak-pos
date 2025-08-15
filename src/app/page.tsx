@@ -134,7 +134,9 @@ const LandingPage = () => {
                 className="text-gray-300 hover:text-white px-4 py-2 text-sm font-medium transition-colors">
                 Sign In
               </button>
-              <button className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-2 rounded-lg text-sm font-medium hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-200 transform hover:scale-105">
+              <button 
+              onClick={goToLogin}
+              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-2 rounded-lg text-sm font-medium hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-200 transform hover:scale-105">
                 Start Free Trial
               </button>
             </div>
@@ -165,10 +167,14 @@ const LandingPage = () => {
                 </button>
               ))}
               <div className="pt-4 pb-2 border-t border-white/10 space-y-2">
-                <button className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium w-full text-left">
+                <button 
+                onClick={goToLogin}
+                className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium w-full text-left">
                   Sign In
                 </button>
-                <button className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-2 rounded-lg text-sm font-medium w-full">
+                <button 
+                onClick={goToLogin}
+                className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-2 rounded-lg text-sm font-medium w-full">
                   Start Free Trial
                 </button>
               </div>
@@ -199,7 +205,9 @@ const LandingPage = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-              <button className="group bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-2xl hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
+              <button 
+              onClick={goToLogin}
+              className="group bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-2xl hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
                 <span>Start Free Trial</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
