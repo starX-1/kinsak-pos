@@ -1,6 +1,5 @@
-// components/Layout/TopBar.tsx
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Menu as MenuIcon, Printer, X } from 'lucide-react';
 
 interface TopBarProps {
@@ -8,14 +7,35 @@ interface TopBarProps {
 }
 
 const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
-    const currentTime = new Date().toLocaleString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric'
-    });
+    const [currentTime, setCurrentTime] = useState('');
+
+    useEffect(() => {
+        const update = () => {
+            setCurrentTime(
+                new Date().toLocaleString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    second: '2-digit', // show ticking seconds
+                    hour12: true,
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
+                })
+            );
+        };
+
+        update(); // update immediately
+
+        // wait until the top of the next second
+        const timeout = setTimeout(() => {
+            update();
+            const timer = setInterval(update, 1000); // update every second after that
+            // cleanup
+            return () => clearInterval(timer);
+        }, 1000 - (Date.now() % 1000));
+
+        return () => clearTimeout(timeout);
+    }, []);
 
     return (
         <div className="bg-indigo-800/30 backdrop-blur-sm border-b border-indigo-700/30 px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">

@@ -160,7 +160,7 @@ const Home: React.FC = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800">
             {/* Mobile Header */}
-            <div className="lg:hidden sticky top-0 z-50 bg-indigo-900/90 backdrop-blur-sm border-b border-indigo-700/30 p-4">
+            <div className="lg:hidden sticky top-0 z-10 bg-indigo-900/90 backdrop-blur-sm border-b border-indigo-700/30 p-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-white text-xl font-bold">Menu</h1>
                     <button
