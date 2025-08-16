@@ -1,8 +1,8 @@
 // / components/Layout / Layout.tsx
 'use client';
 import React, { ReactNode, useState } from 'react';
-import Sidebar from '../components/Sidebar';
-import TopBar from '../components/Topbar';
+import Sidebar from './components/Sidebar';
+import TopBar from './components/Topbar';
 
 interface LayoutProps {
     children: ReactNode;
