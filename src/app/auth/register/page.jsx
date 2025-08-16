@@ -11,24 +11,26 @@ import {
     ArrowLeft,
     Cloud,
     Check,
-    AlertCircle
+    AlertCircle,
+    MapPin
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import auth from '@/app/api/auth/authorization';
 
 const RegisterPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const router = useRouter();
     const [registerForm, setRegisterForm] = useState({
         fullName: '',
         email: '',
         password: '',
         confirmPassword: '',
         restaurantName: '',
-        phone: '',
+        location: '',
         agreeTerms: false
     });
+    const router = useRouter();
 
     const [errors, setErrors] = useState({});
     const [passwordStrength, setPasswordStrength] = useState(0);
@@ -89,8 +91,8 @@ const RegisterPage = () => {
             newErrors.restaurantName = 'Restaurant name is required';
         }
 
-        if (!registerForm.phone.trim()) {
-            newErrors.phone = 'Phone number is required';
+        if (!registerForm.location.trim()) {
+            newErrors.location = 'Restaurant location is required';
         }
 
         if (!registerForm.agreeTerms) {
@@ -105,25 +107,50 @@ const RegisterPage = () => {
         if (!validateRegister()) return;
 
         setIsLoading(true);
-        // Simulate API call
-        setTimeout(() => {
+
+        try {
+            const payload = {
+                name: registerForm.fullName,
+                email: registerForm.email,
+                password: registerForm.password,
+                restaurantName: registerForm.restaurantName,
+                restaurantLocation: registerForm.location,
+            };
+
+            const response = await auth.register(payload);
+
+            if (!response?.success) {
+                setErrors({ general: "Registration failed. Please try again later." });
+                return;
+            }
+
+            // Success: wait briefly before redirect (optional)
+            setTimeout(() => {
+                router.push("/auth/login");
+            }, 2000);
+
+        } catch (error) {
+            console.error("Registration error:", error);
+            setErrors({ general: "Something went wrong. Please try again later." });
+        } finally {
             setIsLoading(false);
-            console.log('Registration attempt:', registerForm);
-            // Handle successful registration here
-        }, 2000);
+        }
     };
+
 
     const handleLoginRedirect = () => {
         router.push('/auth/login');
+        // console.log('Navigate to login');
     };
 
     const handleBackToHome = () => {
         router.push('/');
+        // console.log('Navigate to home');
     };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-            <div className="max-w-md w-full">
+            <div className="w-full max-w-4xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-8">
                     <div className="flex justify-center mb-6">
@@ -131,17 +158,23 @@ const RegisterPage = () => {
                             <Cloud className="w-10 h-10 text-white" />
                         </div>
                     </div>
-                    <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
+                    <h1 className="text-3xl font-bold text-white mb-2">Create Your Restaurant Account</h1>
                     <p className="text-gray-400">Join thousands of restaurants using TicoTaco POS</p>
                 </div>
 
                 {/* Registration Form */}
                 <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-8 shadow-2xl">
-                    <div className="space-y-6">
+                    {errors.general && (
+                        <div className="flex items-center mt-1 text-red-400 text-sm">
+                            <AlertCircle size={16} className="mr-1" />
+                            {errors.general}
+                        </div>
+                    )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Full Name */}
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">
-                                Full Name
+                                Full Name (Will be used as username)
                             </label>
                             <div className="relative">
                                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -191,9 +224,8 @@ const RegisterPage = () => {
                                 </div>
                             )}
                         </div>
-
                         {/* Restaurant Name */}
-                        {/* <div>
+                        <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">
                                 Restaurant Name
                             </label>
@@ -208,7 +240,7 @@ const RegisterPage = () => {
                                         ? 'border-red-500 focus:ring-red-500/50'
                                         : 'border-white/20 focus:ring-yellow-400/50 focus:border-yellow-400/50'
                                         }`}
-                                    placeholder="Enter restaurant name"
+                                    placeholder="Enter your restaurant name"
                                 />
                             </div>
                             {errors.restaurantName && (
@@ -217,34 +249,36 @@ const RegisterPage = () => {
                                     {errors.restaurantName}
                                 </div>
                             )}
-                        </div> */}
+                        </div>
 
-                        {/* Phone */}
-                        {/* <div>
+                        {/* location */}
+                        <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">
-                                Phone Number
+                                Location
                             </label>
                             <div className="relative">
-                                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                                 <input
-                                    type="tel"
-                                    name="phone"
-                                    value={registerForm.phone}
+                                    type="text"
+                                    name="location"
+                                    value={registerForm.location}
                                     onChange={handleRegisterChange}
-                                    className={`w-full pl-10 pr-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${errors.phone
+                                    className={`w-full pl-10 pr-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${errors.location
                                         ? 'border-red-500 focus:ring-red-500/50'
                                         : 'border-white/20 focus:ring-yellow-400/50 focus:border-yellow-400/50'
                                         }`}
-                                    placeholder="Enter phone number"
+                                    placeholder="Enter your restaurant location"
                                 />
                             </div>
-                            {errors.phone && (
+                            {errors.location && (
                                 <div className="flex items-center mt-1 text-red-400 text-sm">
                                     <AlertCircle size={16} className="mr-1" />
-                                    {errors.phone}
+                                    {errors.location}
                                 </div>
                             )}
-                        </div> */}
+                        </div>
+
+
 
                         {/* Password */}
                         <div>
@@ -345,8 +379,8 @@ const RegisterPage = () => {
                             )}
                         </div>
 
-                        {/* Terms Agreement */}
-                        <div>
+                        {/* Terms Agreement - spans full width on both mobile and desktop */}
+                        <div className="md:col-span-2">
                             <label className="flex items-start">
                                 <input
                                     type="checkbox"
@@ -374,24 +408,26 @@ const RegisterPage = () => {
                             )}
                         </div>
 
-                        {/* Register Button */}
-                        <button
-                            onClick={handleRegister}
-                            disabled={isLoading}
-                            className={`w-full py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2 ${isLoading
-                                ? 'bg-gray-600 cursor-not-allowed'
-                                : 'bg-gradient-to-r from-yellow-400 to-orange-500 hover:shadow-lg hover:shadow-orange-500/25 transform hover:scale-[1.02]'
-                                } text-white`}
-                        >
-                            {isLoading ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                                    <span>Creating account...</span>
-                                </>
-                            ) : (
-                                <span>Create Account</span>
-                            )}
-                        </button>
+                        {/* Register Button - spans full width on both mobile and desktop */}
+                        <div className="md:col-span-2">
+                            <button
+                                onClick={handleRegister}
+                                disabled={isLoading}
+                                className={`w-full py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2 ${isLoading
+                                    ? 'bg-gray-600 cursor-not-allowed'
+                                    : 'bg-gradient-to-r from-yellow-400 to-orange-500 hover:shadow-lg hover:shadow-orange-500/25 transform hover:scale-[1.02]'
+                                    } text-white`}
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                        <span>Creating account...</span>
+                                    </>
+                                ) : (
+                                    <span>Create Account</span>
+                                )}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Login Link */}

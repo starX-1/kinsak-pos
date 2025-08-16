@@ -20,7 +20,7 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const [loginForm, setLoginForm] = useState({
-    name: '',
+    username: '',
     password: '',
     rememberMe: false
   });
@@ -236,7 +236,7 @@ const LoginPage = () => {
           {/* Register Link */}
           <div className="mt-6 text-center">
             <p className="text-gray-400">
-              Don't have an account?{' '}
+              Want to create your own Restaurant?{' '}
               <button
                 type="button"
                 onClick={handleRegisterRedirect}
