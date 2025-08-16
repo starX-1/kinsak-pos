@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Menu,
     Users,
@@ -20,6 +20,8 @@ import {
     CheckCircle,
     Info
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 const AdminTopbar = ({
     activeItem = 'dashboard',
@@ -33,7 +35,15 @@ const AdminTopbar = ({
     ]);
     const [showNotifications, setShowNotifications] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
+    const router = useRouter();
+    const { status } = useSession();
 
+    // ✅ Redirect if not authenticated
+    useEffect(() => {
+        if (status === "unauthenticated") {
+            router.push("/auth/login");
+        }
+    }, [status, router]);
     // Mock restaurant data - in real app this would come from props or context
     const restaurantData = {
         name: "Tico Taco Restaurant",

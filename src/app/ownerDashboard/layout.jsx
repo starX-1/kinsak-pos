@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import AdminSidebar from './components/AdminsideBar';
 import AdminTopbar from './components/adminTopBar';
-
+import { SessionProvider } from 'next-auth/react';
+import { ToastContainer } from 'react-toastify';
 const AdminLayout = ({ children, activeItem = 'dashboard' }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [currentActiveItem, setCurrentActiveItem] = useState(activeItem);
@@ -38,42 +39,56 @@ const AdminLayout = ({ children, activeItem = 'dashboard' }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Mobile Backdrop */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={handleCloseSidebar}
-        />
-      )}
+    <SessionProvider>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        {/* Mobile Backdrop */}
+        {isSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={handleCloseSidebar}
+          />
+        )}
 
-      <div className="flex h-screen">
-        {/* Sidebar */}
-        <AdminSidebar
-          activeItem={currentActiveItem}
-          onItemClick={handleItemClick}
-          isSidebarOpen={isSidebarOpen}
-          onCloseSidebar={handleCloseSidebar}
-        />
-
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-          {/* Topbar */}
-          <AdminTopbar
+        <div className="flex h-screen">
+          {/* Sidebar */}
+          <AdminSidebar
             activeItem={currentActiveItem}
-            onMenuToggle={handleMenuToggle}
-            sidebarMenuItems={sidebarMenuItems}
+            onItemClick={handleItemClick}
+            isSidebarOpen={isSidebarOpen}
+            onCloseSidebar={handleCloseSidebar}
           />
 
-          {/* Page Content */}
-          <main className="flex-1 overflow-auto p-6">
-            <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-8 h-full">
+          {/* Main Content Area */}
+          <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+            {/* Topbar */}
+            <AdminTopbar
+              activeItem={currentActiveItem}
+              onMenuToggle={handleMenuToggle}
+              sidebarMenuItems={sidebarMenuItems}
+            />
+
+            {/* Page Content */}
+            <main className="flex-1 overflow-auto p-6">
+              {/* <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-8 h-full"> */}
               {children}
-            </div>
-          </main>
+              {/* </div> */}
+            </main>
+          </div>
         </div>
       </div>
-    </div>
+    </SessionProvider>
   );
 };
 

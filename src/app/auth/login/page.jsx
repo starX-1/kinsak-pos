@@ -79,7 +79,7 @@ const LoginPage = () => {
       // console.log("Session:", session);
 
       if (session?.user?.role === "ADMIN") {
-        router.push("/dashboard");
+        router.push("/ownerDashboard");
       } else if (session?.user?.role === "WAITER") {
         router.push("/dashboard");
       } else {

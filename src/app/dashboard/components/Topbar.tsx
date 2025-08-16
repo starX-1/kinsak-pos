@@ -1,6 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Search, Menu as MenuIcon, Printer, X } from 'lucide-react';
+import { Search, Menu as MenuIcon, Printer, X, LogOut } from 'lucide-react';
+import { signOut, useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 interface TopBarProps {
     onMenuClick: () => void;
@@ -8,6 +10,15 @@ interface TopBarProps {
 
 const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
     const [currentTime, setCurrentTime] = useState('');
+    const router = useRouter();
+    const {  status } = useSession();
+
+    // ✅ Redirect if not authenticated
+    useEffect(() => {
+        if (status === "unauthenticated") {
+            router.push("/auth/login");
+        }
+    }, [status, router]);
 
     useEffect(() => {
         const update = () => {
@@ -36,6 +47,11 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
 
         return () => clearTimeout(timeout);
     }, []);
+
+    const handleLogout = () => {
+        signOut({ callbackUrl: '/auth/login' });
+        // router.push('/auth/login')
+    }
 
     return (
         <div className="bg-indigo-800/30 backdrop-blur-sm border-b border-indigo-700/30 px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
@@ -77,22 +93,26 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
                     {/* Bill Info - Hidden on very small screens */}
                     <div className="text-right hidden sm:block">
                         <p className="text-white text-sm sm:text-lg font-bold">
-                            Bill #45555
+                            John Doe
                         </p>
-                        <p className="text-indigo-200 text-xs sm:text-sm">
-                            Table • Customer
-                        </p>
+                        <button
+                            onClick={handleLogout}
+                            className='flex items-center p-2 border border-red-400 text-indigo-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors'
+                        >
+                            <LogOut className='w-4 h-4 mr-2' />
+                            Logout
+                        </button>
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center space-x-1 sm:space-x-2">
+                    {/* <div className="flex items-center space-x-1 sm:space-x-2">
                         <button className="p-2 text-indigo-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
                             <Printer size={18} />
                         </button>
                         <button className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors">
                             <X size={18} />
                         </button>
-                    </div>
+                    </div> */}
                 </div>
             </div>
 
