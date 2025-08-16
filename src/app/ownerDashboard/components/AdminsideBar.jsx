@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     LayoutDashboard,
     Menu,
@@ -17,6 +17,9 @@ import {
     X
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import AdminAPi from '@/app/api/admin/routes';
+import { toast } from 'react-toastify';
+import { signOut } from 'next-auth/react';
 
 const AdminSidebar = ({
     activeItem = 'dashboard',
@@ -28,19 +31,31 @@ const AdminSidebar = ({
 
     const router = useRouter();
     // Mock restaurant data - in real app this would come from props or context
-    const restaurantData = {
-        name: "Tico Taco Restaurant",
-        owner: "Maria Rodriguez",
-        avatar: "/assets/profile-pos.jpg",
+const [loading, setLoading]= useState(false);
+    const [restaurantData, setRestaurantData] = useState({});
+
+    const fetchAdminRestaurant = async () => {
+        setLoading (true)
+        const response = await AdminAPi.getAdminRestaurant();
+        if (response.error) {
+            toast.error(response.error);
+            return;
+        }
+        // console.log(response);
+        setRestaurantData(response.data);
+        setLoading(false);
     };
 
+    useEffect(() => {
+        fetchAdminRestaurant();
+    }, []);
 
     const sidebarMenuItems = [
         {
             id: 'dashboard',
             icon: <LayoutDashboard size={20} />,
             label: 'Dashboard',
-            path: '/admin/dashboard'
+            path: '/ownerDashboard',
         },
         {
             id: 'orders',
@@ -174,6 +189,10 @@ const AdminSidebar = ({
         }
     };
 
+    const handleLogout = () => {
+        signOut({ callbackUrl: '/auth/login' });
+        // router.push('/auth/login')
+    };
     return (
         <div className={`
       fixed lg:static inset-y-0 left-0 z-50 lg:z-auto
@@ -213,7 +232,14 @@ const AdminSidebar = ({
                             <Store className="w-5 h-5 text-white" />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-white font-medium text-sm truncate">{restaurantData.name}</p>
+                            {
+                                loading ? (
+                                    <p className="text-white font-medium text-sm">Loading...</p>
+                                ) : (
+                                    <p className="text-white font-medium text-sm">{restaurantData.name}</p>
+                                )
+                            }
+                            {/* <p className="text-white font-medium text-sm truncate">{restaurantData.name}</p> */}
                             <p className="text-gray-300 text-xs">Owner Dashboard</p>
                         </div>
                     </div>
@@ -286,7 +312,7 @@ const AdminSidebar = ({
             <div className="p-4 border-t border-white/10">
                 <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors cursor-pointer">
                     <img
-                        src={restaurantData.avatar}
+                        src='/assets/profile-pos.jpg'
                         alt={restaurantData.owner}
                         className="w-10 h-10 rounded-full object-cover border-2 border-yellow-400/30"
                     />
@@ -294,7 +320,9 @@ const AdminSidebar = ({
                         <p className="text-white font-medium text-sm truncate">{restaurantData.owner}</p>
                         <p className="text-gray-300 text-xs">Restaurant Owner</p>
                     </div>
-                    <LogOut className="w-4 h-4 text-white/70 hover:text-red-400 transition-colors" />
+                    <LogOut 
+                    onClick={handleLogout}
+                    className="w-4 h-4 text-white/70 hover:text-red-400 transition-colors" />
                 </div>
             </div>
         </div>

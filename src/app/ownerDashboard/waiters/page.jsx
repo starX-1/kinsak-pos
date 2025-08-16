@@ -215,12 +215,12 @@ const WaitersManagementPage = () => {
         }));
     }, []);
 
-    const handleSelectedWaiterStatusChange = useCallback((e) => {
-        setSelectedWaiter(prev => ({
-            ...prev,
-            isActive: e.target.value === 'true'
-        }));
-    }, []);
+    // const handleSelectedWaiterStatusChange = useCallback((e) => {
+    //     setSelectedWaiter(prev => ({
+    //         ...prev,
+    //         isActive: e.target.value === 'true'
+    //     }));
+    // }, []);
 
     // Modal handlers
     const handleCloseAddModal = useCallback(() => {
@@ -341,18 +341,18 @@ const WaitersManagementPage = () => {
                 </div>
             )
         }),
-        columnHelper.accessor('isActive', {
-            header: 'Status',
-            cell: ({ row }) => (
-                <span className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium border whitespace-nowrap ${row.original.isActive
-                    ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                    : 'bg-red-500/20 text-red-400 border-red-500/30'
-                    }`}>
-                    {row.original.isActive ? <CheckCircle size={12} /> : <XCircle size={12} />}
-                    <span>{row.original.isActive ? 'Active' : 'Inactive'}</span>
-                </span>
-            )
-        }),
+        // columnHelper.accessor('isActive', {
+        //     header: 'Status',
+        //     cell: ({ row }) => (
+        //         <span className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium border whitespace-nowrap ${row.original.isActive
+        //             ? 'bg-green-500/20 text-green-400 border-green-500/30'
+        //             : 'bg-red-500/20 text-red-400 border-red-500/30'
+        //             }`}>
+        //             {row.original.isActive ? <CheckCircle size={12} /> : <XCircle size={12} />}
+        //             <span>{row.original.isActive ? 'Active' : 'Inactive'}</span>
+        //         </span>
+        //     )
+        // }),
         columnHelper.accessor('createdAt', {
             header: ({ column }) => (
                 <button
@@ -405,7 +405,7 @@ const WaitersManagementPage = () => {
     const activeWaiters = useMemo(() => waitersData.filter(w => w.isActive).length, [waitersData]);
     const inactiveWaiters = useMemo(() => waitersData.filter(w => w.isActive === false).length, [waitersData]);
     const activeRate = useMemo(() =>
-        waitersData.length > 0 ? ((activeWaiters / waitersData.length) * 100).toFixed(0) : 0,
+        waitersData.length > 0 ? ((waitersData.length / waitersData.length) * 100).toFixed(0) : 0,
         [activeWaiters, waitersData.length]
     );
 
@@ -453,7 +453,7 @@ const WaitersManagementPage = () => {
                                 <CheckCircle className="w-6 h-6 text-green-400" />
                             </div>
                             <div>
-                                <p className="text-2xl font-bold text-white">{activeWaiters}</p>
+                                <p className="text-2xl font-bold text-white">{waitersData.length}</p>
                                 <p className="text-gray-400 text-sm">Active</p>
                             </div>
                         </div>
@@ -739,7 +739,7 @@ const WaitersManagementPage = () => {
                                 />
                             </div>
 
-                            <div>
+                            {/* <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
                                 <select
                                     name='isActive'
@@ -750,7 +750,7 @@ const WaitersManagementPage = () => {
                                     <option value="true">Active</option>
                                     <option value="false">Inactive</option>
                                 </select>
-                            </div>
+                            </div> */}
 
                             <div className="flex items-center justify-end space-x-3 pt-6 border-t border-slate-600">
                                 <button

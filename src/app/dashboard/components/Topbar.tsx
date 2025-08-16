@@ -11,7 +11,8 @@ interface TopBarProps {
 const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
     const [currentTime, setCurrentTime] = useState('');
     const router = useRouter();
-    const {  status } = useSession();
+    const [user, setUser] = useState<{ name?: string | null; email?: string | null; image?: string | null } | null>(null);
+    const { data: session, status } = useSession();
 
     // ✅ Redirect if not authenticated
     useEffect(() => {
@@ -19,6 +20,15 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
             router.push("/auth/login");
         }
     }, [status, router]);
+
+    const profiler = async () => {
+        const currentProfile = session?.user;
+        setUser(currentProfile ?? null);
+    }
+
+    useEffect(() => {
+        profiler();
+    }, [session]);
 
     useEffect(() => {
         const update = () => {
@@ -77,7 +87,7 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
                 </div>
 
                 {/* Center Section - Search */}
-                <div className="flex-1 max-w-xs sm:max-w-md mx-2 sm:mx-8">
+                {/* <div className="flex-1 max-w-xs sm:max-w-md mx-2 sm:mx-8">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-indigo-300" size={16} />
                         <input
@@ -86,14 +96,14 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
                             className="w-full bg-indigo-700/30 border border-indigo-600/30 rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 backdrop-blur-sm"
                         />
                     </div>
-                </div>
+                </div> */}
 
                 {/* Right Section - Bill Info and Actions */}
                 <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
                     {/* Bill Info - Hidden on very small screens */}
                     <div className="text-right hidden sm:block">
                         <p className="text-white text-sm sm:text-lg font-bold">
-                            John Doe
+                            {user?.name}
                         </p>
                         <button
                             onClick={handleLogout}
@@ -119,8 +129,13 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
             {/* Mobile Bill Info */}
             <div className="sm:hidden mt-2 pt-2 border-t border-indigo-700/30">
                 <div className="flex justify-between items-center">
-                    <p className="text-white text-sm font-bold">Bill #45555</p>
-                    <p className="text-indigo-200 text-xs">Table • Customer</p>
+                    <p className="text-white text-sm font-bold">{user?.name}</p>
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center space-x-2 border border-red-400 rounded-lg p-2 text-indigo-200 text-xs">
+                        <LogOut className='w-4 h-4 mr-2' />
+                        Logout
+                    </button>
                 </div>
             </div>
         </div>
