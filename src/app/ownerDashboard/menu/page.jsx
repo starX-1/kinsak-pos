@@ -301,12 +301,13 @@ const FoodManagementPage = () => {
     const handleAddFood = useCallback(async () => {
         setLoading(true);
         try {
-            const data = new FormData();
-            data.append('name', newFood.name);
-            data.append('description', newFood.description);
-            data.append('price', newFood.price);
-            data.append('category', newFood.category);
-            data.append('image', newFood.image);
+            const data = {
+                name: newFood.name,
+                description: newFood.description,
+                price: newFood.price,
+                category: newFood.category,
+                image: newFood.image
+            }
 
             
             const response = await AdminAPi.createFood(data);

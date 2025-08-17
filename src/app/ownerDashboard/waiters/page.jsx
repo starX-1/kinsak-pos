@@ -290,14 +290,28 @@ const WaitersManagementPage = () => {
         }
     }, [newWaiter, waitersData]);
 
-    const handleEditWaiter = useCallback(() => {
-        setWaitersData(prev => prev.map(waiter =>
-            waiter.id === selectedWaiter.id ? selectedWaiter : waiter
-        ));
-        setShowEditModal(false);
-        setSelectedWaiter(null);
-        toast.success('Waiter updated successfully');
+    const handleEditWaiter = useCallback(async () => {
+        if (!selectedWaiter) return;
+
+        try {
+            const updatedWaiter = {
+                ...selectedWaiter,
+                name: selectedWaiter.name,
+                email: selectedWaiter.email,
+                password: selectedWaiter.password
+            };
+
+            await AdminAPi.updateWaiter(selectedWaiter._id, updatedWaiter);
+
+            toast.success('Waiter updated successfully');
+            setShowEditModal(false);
+            setSelectedWaiter(null);
+        } catch (error) {
+            console.error("Failed to update waiter:", error);
+            toast.error("Failed to update waiter");
+        }
     }, [selectedWaiter]);
+
 
     const handleDeleteWaiter = useCallback(() => {
         setWaitersData(prev => prev.filter(waiter => waiter.id !== selectedWaiter.id));
