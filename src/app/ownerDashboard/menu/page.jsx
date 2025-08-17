@@ -28,29 +28,30 @@ import {
     flexRender,
     createColumnHelper
 } from '@tanstack/react-table';
-
+import { toast } from 'react-toastify';
+import AdminAPi from '@/app/api/admin/routes';
 // Mock toast for demo
-const toast = {
-    success: (msg) => console.log('Success:', msg),
-    error: (msg) => console.log('Error:', msg)
-};
+// const toast = {
+//     success: (msg) => console.log('Success:', msg),
+//     error: (msg) => console.log('Error:', msg)
+// };
 
 // Mock AdminAPi for demo
-const AdminAPi = {
-    addFood: async (food) => {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return { success: true };
-    },
-    updateFood: async (food) => {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return { success: true };
-    },
-    deleteFood: async (id) => {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return { success: true };
-    }
-};
+// const AdminAPi = {
+//     addFood: async (food) => {
+//         // Simulate API call
+//         await new Promise(resolve => setTimeout(resolve, 500));
+//         return { success: true };
+//     },
+//     updateFood: async (food) => {
+//         await new Promise(resolve => setTimeout(resolve, 500));
+//         return { success: true };
+//     },
+//     deleteFood: async (id) => {
+//         await new Promise(resolve => setTimeout(resolve, 500));
+//         return { success: true };
+//     }
+// };
 
 // ActionDropdown component
 const ActionDropdown = React.memo(({ food, onEdit, onDelete, onView }) => {
@@ -177,10 +178,10 @@ const FoodManagementPage = () => {
     const [loading, setLoading] = useState(false);
 
     // Food categories
-    const categories = [
-        'Appetizers', 'Main Course', 'Desserts', 'Beverages',
-        'Salads', 'Soups', 'Pasta', 'Pizza', 'Burgers', 'Seafood'
-    ];
+    // const categories = [
+    //     'Appetizers', 'Main Course', 'Desserts', 'Beverages',
+    //     'Salads', 'Soups', 'Pasta', 'Pizza', 'Burgers', 'Seafood'
+    // ];
 
     // Sample food data - conforming to backend structure
     const [foodsData, setFoodsData] = useState([
@@ -300,7 +301,15 @@ const FoodManagementPage = () => {
     const handleAddFood = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await AdminAPi.addFood(newFood);
+            const data = new FormData();
+            data.append('name', newFood.name);
+            data.append('description', newFood.description);
+            data.append('price', newFood.price);
+            data.append('category', newFood.category);
+            data.append('image', newFood.image);
+
+            
+            const response = await AdminAPi.createFood(data);
             if (response.error) {
                 toast.error(response.error);
                 return;
@@ -496,6 +505,8 @@ const FoodManagementPage = () => {
     // Button click handlers
     const handleShowAddModal = useCallback(() => setShowAddModal(true), []);
 
+
+
     return (
         <div className="min-h-screen p-4">
             <div className="max-w-7xl mx-auto space-y-6">
@@ -518,7 +529,7 @@ const FoodManagementPage = () => {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6">
                         <div className="flex items-center space-x-3">
                             <div className="p-3 bg-orange-500/20 rounded-lg">
@@ -555,7 +566,7 @@ const FoodManagementPage = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6">
+                    {/* <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6">
                         <div className="flex items-center space-x-3">
                             <div className="p-3 bg-purple-500/20 rounded-lg">
                                 <ChefHat className="w-6 h-6 text-purple-400" />
@@ -565,7 +576,7 @@ const FoodManagementPage = () => {
                                 <p className="text-gray-400 text-sm">Menu Types</p>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Search and Filters */}
@@ -715,8 +726,8 @@ const FoodManagementPage = () => {
                                 <input
                                     name='image'
                                     type="file"
-                                    value={newFood.image}
-                                    onChange={handleNewFoodChange}
+                                    // value={newFood.image}
+                                    onChange={(e) => setNewFood({ ...newFood, image: e.target.files[0] })}
                                     className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
                                 // placeholder="https://example.com/food-image.jpg"
                                 />
@@ -849,7 +860,7 @@ const FoodManagementPage = () => {
                                         onChange={handleSelectedFoodChange}
                                         className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
                                     />
-                                    
+
                                 </div>
                             </div>
 

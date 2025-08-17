@@ -28,6 +28,23 @@ class AdminRoutes {
             throw error;
         }
     }
+    async createFood(data: FormData) {
+        try {
+            for (let [key, value] of data.entries()) {
+                console.log(key, value);
+            }
+            const response = await authenticatedInstance.post("/api/food", data, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Food creation failed:", error);
+            throw error;
+        }
+    }
+
 }
 
 
