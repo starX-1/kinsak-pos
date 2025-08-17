@@ -77,7 +77,7 @@ const [loading, setLoading]= useState(false);
             label: 'Menu Management',
             path: '/admin/menu',
             submenu: [
-                { id: 'menu-items', label: 'Menu Items', path: '/admin/menu/items' },
+                { id: 'menu-items', label: 'Menu Items', path: '/ownerDashboard/menu' },
                 { id: 'categories', label: 'Categories', path: '/admin/menu/categories' },
                 { id: 'modifiers', label: 'Modifiers', path: '/admin/menu/modifiers' },
                 { id: 'pricing', label: 'Pricing', path: '/admin/menu/pricing' }
