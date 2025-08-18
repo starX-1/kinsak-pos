@@ -4,6 +4,7 @@ import React, { ReactNode, useState } from 'react';
 import Sidebar from './components/Sidebar';
 import TopBar from './components/Topbar';
 import { SessionProvider } from 'next-auth/react';
+import { ToastContainer } from 'react-toastify';
 
 interface LayoutProps {
     children: ReactNode;
@@ -22,6 +23,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     return (
         <SessionProvider>
+            <ToastContainer />
+
             <div className="flex h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 overflow-hidden">
                 {/* Mobile Backdrop */}
                 {isSidebarOpen && (
@@ -53,6 +56,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </main>
                 </div>
             </div>
+
         </SessionProvider>
     );
 };

@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import { Heart, Grid3X3, List, Plus, Minus, Percent, ShoppingCart, X } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 interface MenuItem {
     id: string;
@@ -27,18 +28,7 @@ const Home: React.FC = () => {
     const [activeCategory, setActiveCategory] = useState('burger');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [showCart, setShowCart] = useState(false);
-    const [cart, setCart] = useState<CartItem[]>([
-        {
-            id: '1',
-            name: 'Original Burger (2x30)',
-            price: 59,
-            image: '/burger.jpg',
-            category: 'burger',
-            items: 11,
-            quantity: 6,
-            extraSauce: true
-        }
-    ]);
+    const [cart, setCart] = useState<CartItem[]>([]);
 
     const categories: Category[] = [
         { id: 'burger', name: 'Burger', icon: '🍔', isActive: true },
@@ -156,6 +146,8 @@ const Home: React.FC = () => {
     const getTotalItems = () => {
         return cart.reduce((total, item) => total + item.quantity, 0);
     };
+
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800">
@@ -297,6 +289,8 @@ const Home: React.FC = () => {
                         getTotal={getTotal}
                         getServiceCharge={getServiceCharge}
                         getTax={getTax}
+                        setCart={setCart}
+                        // showCart={showCart}
                         getGrandTotal={getGrandTotal}
                     />
                 </div>
@@ -321,6 +315,8 @@ const Home: React.FC = () => {
                                     getTotal={getTotal}
                                     getServiceCharge={getServiceCharge}
                                     getTax={getTax}
+                                    setCart={setCart}
+                                    setShowCart={setShowCart}
                                     getGrandTotal={getGrandTotal}
                                     isMobile={true}
                                 />
@@ -341,8 +337,29 @@ const CartContent: React.FC<{
     getServiceCharge: () => number;
     getTax: () => number;
     getGrandTotal: () => number;
+    setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
+    setShowCart?: React.Dispatch<React.SetStateAction<boolean>>;
     isMobile?: boolean;
-}> = ({ cart, updateQuantity, getTotal, getServiceCharge, getTax, getGrandTotal, isMobile = false }) => {
+}> = ({ cart, updateQuantity, getTotal, getServiceCharge, getTax, getGrandTotal, setShowCart, setCart, isMobile = false }) => {
+
+    const [loading, setLoading] = useState(false);
+
+    const handleMakeOrder = async () => {
+        setLoading(true);
+        // Here you would call your API to make the order
+        if (cart.length === 0) {
+            toast.error("Your cart is empty!");
+            return;
+        }
+        toast.success("Order placed successfully!");
+        console.log("Order placed with items:", cart);
+        setLoading(false);
+        // empty the cart 
+        setCart([]);
+        if (setShowCart) setShowCart(false); // Close cart if in mobile view
+        
+
+    };
     return (
         <>
             {/* Cart Header - Desktop only */}
@@ -435,8 +452,10 @@ const CartContent: React.FC<{
                     <button className="flex-1 bg-yellow-400 text-gray-800 font-semibold py-3 rounded-lg hover:bg-yellow-300 transition-colors active:scale-95 text-sm lg:text-base">
                         Save
                     </button>
-                    <button className="flex-1 bg-green-500 text-white font-semibold py-3 rounded-lg hover:bg-green-600 transition-colors active:scale-95 text-sm lg:text-base">
-                        Order
+                    <button
+                        onClick={handleMakeOrder}
+                        className="flex-1 bg-green-500 text-white font-semibold py-3 rounded-lg hover:bg-green-600 transition-colors active:scale-95 text-sm lg:text-base">
+                        Order Now
                     </button>
                 </div>
             </div>
