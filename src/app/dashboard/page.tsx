@@ -168,13 +168,37 @@ const Home: React.FC = () => {
 
                         {/* Order Type Buttons */}
                         <div className="flex space-x-3">
-                            {/* instead use search bar  */}
+                            {/* Search bar with icons inside */}
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Search food, category, or description..."
+                                    value={searchTerm}
+                                    onChange={(e) => handleSearchChange(e.target.value)}
+                                    className="bg-indigo-800/50 border border-indigo-700/30 text-white rounded-lg px-4 py-2 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent w-80"
+                                />
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-indigo-300" size={16} />
+                                {searchTerm && (
+                                    <button
+                                        onClick={() => setSearchTerm('')}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-indigo-300 hover:text-white"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Mobile Order Type Buttons */}
+                    <div className="lg:hidden mb-4">
+                        <div className="relative">
                             <input
                                 type="text"
-                                placeholder="Search food, category, or description..."
+                                placeholder="Search food..."
                                 value={searchTerm}
                                 onChange={(e) => handleSearchChange(e.target.value)}
-                                className="bg-indigo-800/50 border border-indigo-700/30 text-white rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent w-80"
+                                className="bg-indigo-800/50 border border-indigo-700/30 text-white rounded-lg px-4 py-2 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent w-full"
                             />
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-indigo-300" size={16} />
                             {searchTerm && (
@@ -185,28 +209,7 @@ const Home: React.FC = () => {
                                     <X size={16} />
                                 </button>
                             )}
-
                         </div>
-                    </div>
-
-                    {/* Mobile Order Type Buttons */}
-                    <div className="lg:hidden flex space-x-2 mb-4 overflow-x-auto">
-                        <input
-                            type="text"
-                            placeholder="Search food, category, or description..."
-                            value={searchTerm}
-                            onChange={(e) => handleSearchChange(e.target.value)}
-                            className="bg-indigo-800/50 border border-indigo-700/30 text-white rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent w-80"
-                        />
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-indigo-300" size={16} />
-                        {searchTerm && (
-                            <button
-                                onClick={() => setSearchTerm('')}
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-indigo-300 hover:text-white"
-                            >
-                                <X size={16} />
-                            </button>
-                        )}
                     </div>
 
                     {/* Category Tabs */}

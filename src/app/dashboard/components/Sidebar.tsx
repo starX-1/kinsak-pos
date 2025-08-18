@@ -11,11 +11,13 @@ import {
     Cloud,
     X
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface SidebarItem {
     id: string;
     icon: (size: number) => React.ReactElement;
     label: string;
+    path?: string; // Optional path for navigation
     isActive?: boolean;
 }
 
@@ -25,38 +27,48 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     const [activeItem, setActiveItem] = useState('home');
+    const router = useRouter();
+
 
     const sidebarItems: SidebarItem[] = [
         {
             id: 'home',
             icon: (size: number) => <Home size={size} />,
             label: 'Home',
+            path: '/dashboard',
             isActive: activeItem === 'home'
         },
-        {
-            id: 'menu',
-            icon: (size: number) => <Menu size={size} />,
-            label: 'Menu'
-        },
+        // {
+        //     id: 'menu',
+        //     icon: (size: number) => <Menu size={size} />,
+        //     label: 'Menu'
+        // },
         {
             id: 'payments',
             icon: (size: number) => <CreditCard size={size} />,
+            path: '/dashboard/payments',
             label: 'Payments'
         },
         {
             id: 'receipts',
             icon: (size: number) => <FileText size={size} />,
+            path: '/receipts',
             label: 'Receipts'
         },
-        {
-            id: 'delivery',
-            icon: (size: number) => <Settings size={size} />,
-            label: 'Delivery & Settlement'
-        }
+        // {
+        //     id: 'delivery',
+        //     icon: (size: number) => <Settings size={size} />,
+        //     label: 'Delivery & Settlement'
+        // }
     ];
 
     const handleItemClick = (itemId: string) => {
         setActiveItem(itemId);
+        // Navigate to the item's path if defined
+        const item = sidebarItems.find(i => i.id === itemId);
+        if (item && item.path) {
+            router.push(item.path);
+        }
         // Close sidebar on mobile after selection
         if (onClose) {
             onClose();
@@ -92,11 +104,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
                 <ul className="space-y-3 sm:space-y-4 px-1 sm:px-2">
                     {sidebarItems.map((item) => (
                         <li key={item.id}>
+
                             <button
                                 onClick={() => handleItemClick(item.id)}
                                 className={`w-full flex flex-col items-center p-2 sm:p-3 rounded-xl transition-all duration-200 group ${item.isActive || activeItem === item.id
-                                        ? 'bg-yellow-400 text-gray-800'
-                                        : 'text-white/70 hover:text-white hover:bg-white/10'
+                                    ? 'bg-yellow-400 text-gray-800'
+                                    : 'text-white/70 hover:text-white hover:bg-white/10'
                                     }`}
                             >
                                 <div className="mb-1">
