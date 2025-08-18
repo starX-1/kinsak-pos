@@ -1,13 +1,15 @@
 'use client'
-import React, { useState } from 'react';
-import { Heart, Grid3X3, List, Plus, Minus, Percent, ShoppingCart, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Heart, Grid3X3, Plus, Minus, Percent, ShoppingCart, X, Search } from 'lucide-react';
 import { toast } from 'react-toastify';
+import WaiterRoutes from '@/app/api/waiter/routes';
 
 interface MenuItem {
-    id: string;
+    _id: string;
     name: string;
     price: number;
     image: string;
+    description: string;
     category: string;
     items: number;
 }
@@ -29,86 +31,55 @@ const Home: React.FC = () => {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [showCart, setShowCart] = useState(false);
     const [cart, setCart] = useState<CartItem[]>([]);
+    // const [loading, setLoading] = useState(false);
+    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
-    const categories: Category[] = [
-        { id: 'burger', name: 'Burger', icon: '🍔', isActive: true },
-        { id: 'noodles', name: 'Noodles', icon: '🍜' },
-        { id: 'drinks', name: 'Drinks', icon: '🥤' },
-        { id: 'desserts', name: 'Desserts', icon: '🍰' }
-    ];
-
-    const menuItems: MenuItem[] = [
-        {
-            id: '1',
-            name: 'Original Burger',
-            price: 59,
-            image: '/api/placeholder/200/150',
-            category: 'burger',
-            items: 11
-        },
-        {
-            id: '2',
-            name: 'Cheese Burger',
-            price: 65,
-            image: '/api/placeholder/200/150',
-            category: 'burger',
-            items: 8
-        },
-        {
-            id: '3',
-            name: 'Spicy Burger',
-            price: 72,
-            image: '/api/placeholder/200/150',
-            category: 'burger',
-            items: 15
-        },
-        {
-            id: '4',
-            name: 'Double Burger',
-            price: 89,
-            image: '/api/placeholder/200/150',
-            category: 'burger',
-            items: 6
-        },
-        {
-            id: '5',
-            name: 'Veggie Burger',
-            price: 55,
-            image: '/api/placeholder/200/150',
-            category: 'burger',
-            items: 12
-        },
-        {
-            id: '6',
-            name: 'BBQ Burger',
-            price: 78,
-            image: '/api/placeholder/200/150',
-            category: 'burger',
-            items: 9
-        },
-        {
-            id: '7',
-            name: 'Chicken Burger',
-            price: 69,
-            image: '/api/placeholder/200/150',
-            category: 'burger',
-            items: 14
-        },
-        {
-            id: '8',
-            name: 'Fish Burger',
-            price: 75,
-            image: '/api/placeholder/200/150',
-            category: 'burger',
-            items: 7
+    const fetchMenu = async () => {
+        try {
+            const response = await WaiterRoutes.getMenu();
+            console.log("Fetched menu items:", response);
+            setMenuItems(response.data);
+        } catch (error) {
+            console.error('Failed to fetch menu:', error);
+            toast.error('Failed to load menu');
         }
-    ];
+    };
+
+    useEffect(() => {
+        fetchMenu();
+    }, []);
+
+    // const categories: Category[] = [
+    //     { id: 'burger', name: 'Burger', icon: '🍔', isActive: true },
+    //     { id: 'noodles', name: 'Noodles', icon: '🍜' },
+    //     { id: 'drinks', name: 'Drinks', icon: '🥤' },
+    //     { id: 'desserts', name: 'Desserts', icon: '🍰' }
+    // ];
+
+
+
+
+    const filteredMenuItems = menuItems.filter(item => {
+        if (!searchTerm.trim()) {
+            return true; // Show all items when no search term
+        }
+
+        return item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.category?.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+
+    const handleSearchChange = (value: string) => {
+        setSearchTerm(value);
+    };
+
 
     const addToCart = (item: MenuItem) => {
-        const existingItem = cart.find(cartItem => cartItem.id === item.id);
+        const existingItem = cart.find(cartItem => cartItem._id === item._id);
         if (existingItem) {
             setCart(cart.map(cartItem =>
-                cartItem.id === item.id
+                cartItem._id === item._id
                     ? { ...cartItem, quantity: cartItem.quantity + 1 }
                     : cartItem
             ));
@@ -119,10 +90,10 @@ const Home: React.FC = () => {
 
     const updateQuantity = (id: string, quantity: number) => {
         if (quantity <= 0) {
-            setCart(cart.filter(item => item.id !== id));
+            setCart(cart.filter(item => item._id !== id));
         } else {
             setCart(cart.map(item =>
-                item.id === id ? { ...item, quantity } : item
+                item._id === id ? { ...item, quantity } : item
             ));
         }
     };
@@ -185,45 +156,61 @@ const Home: React.FC = () => {
                                 >
                                     <Grid3X3 size={20} />
                                 </button>
-                                <button
+                                {/* <button
                                     onClick={() => setViewMode('list')}
                                     className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-white/20 text-white' : 'text-white/60 hover:text-white'
                                         }`}
                                 >
                                     <List size={20} />
-                                </button>
+                                </button> */}
                             </div>
                         </div>
 
                         {/* Order Type Buttons */}
                         <div className="flex space-x-3">
-                            <button className="px-4 py-2 bg-yellow-400 text-gray-800 font-semibold rounded-lg">
-                                Dine In
-                            </button>
-                            <button className="px-4 py-2 bg-indigo-600/50 text-white rounded-lg border border-indigo-500">
-                                Delivery
-                            </button>
-                            <button className="px-4 py-2 bg-indigo-600/50 text-white rounded-lg border border-indigo-500">
-                                Take Away
-                            </button>
+                            {/* instead use search bar  */}
+                            <input
+                                type="text"
+                                placeholder="Search food, category, or description..."
+                                value={searchTerm}
+                                onChange={(e) => handleSearchChange(e.target.value)}
+                                className="bg-indigo-800/50 border border-indigo-700/30 text-white rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent w-80"
+                            />
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-indigo-300" size={16} />
+                            {searchTerm && (
+                                <button
+                                    onClick={() => setSearchTerm('')}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-indigo-300 hover:text-white"
+                                >
+                                    <X size={16} />
+                                </button>
+                            )}
+
                         </div>
                     </div>
 
                     {/* Mobile Order Type Buttons */}
                     <div className="lg:hidden flex space-x-2 mb-4 overflow-x-auto">
-                        <button className="px-4 py-2 bg-yellow-400 text-gray-800 font-semibold rounded-lg whitespace-nowrap">
-                            Dine In
-                        </button>
-                        <button className="px-4 py-2 bg-indigo-600/50 text-white rounded-lg border border-indigo-500 whitespace-nowrap">
-                            Delivery
-                        </button>
-                        <button className="px-4 py-2 bg-indigo-600/50 text-white rounded-lg border border-indigo-500 whitespace-nowrap">
-                            Take Away
-                        </button>
+                        <input
+                            type="text"
+                            placeholder="Search food, category, or description..."
+                            value={searchTerm}
+                            onChange={(e) => handleSearchChange(e.target.value)}
+                            className="bg-indigo-800/50 border border-indigo-700/30 text-white rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent w-80"
+                        />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-indigo-300" size={16} />
+                        {searchTerm && (
+                            <button
+                                onClick={() => setSearchTerm('')}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-indigo-300 hover:text-white"
+                            >
+                                <X size={16} />
+                            </button>
+                        )}
                     </div>
 
                     {/* Category Tabs */}
-                    <div className="flex space-x-2 mb-4 lg:mb-6 overflow-x-auto pb-2">
+                    {/* <div className="flex space-x-2 mb-4 lg:mb-6 overflow-x-auto pb-2">
                         {categories.map((category) => (
                             <button
                                 key={category.id}
@@ -237,7 +224,7 @@ const Home: React.FC = () => {
                                 <span className="text-sm lg:text-base">{category.name}</span>
                             </button>
                         ))}
-                    </div>
+                    </div> */}
 
                     {/* Menu Grid */}
                     <div className="flex-1 overflow-y-auto">
@@ -245,9 +232,9 @@ const Home: React.FC = () => {
                             ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4'
                             : 'space-y-3'
                             }`}>
-                            {menuItems.map((item) => (
+                            {filteredMenuItems.map((item) => (
                                 <div
-                                    key={item.id}
+                                    key={item._id}
                                     onClick={() => addToCart(item)}
                                     className="bg-indigo-800/30 backdrop-blur-sm border border-indigo-700/30 rounded-xl overflow-hidden cursor-pointer hover:bg-indigo-700/40 transition-all active:scale-95"
                                 >
@@ -271,8 +258,8 @@ const Home: React.FC = () => {
                                     <div className="p-3 lg:p-4">
                                         <h3 className="text-white font-semibold mb-2 text-sm lg:text-base">{item.name}</h3>
                                         <div className="flex items-center justify-between">
-                                            <span className="text-xl lg:text-2xl font-bold text-white">${item.price}</span>
-                                            <span className="text-indigo-300 text-xs lg:text-sm">{item.items} Items</span>
+                                            <span className="text-xl lg:text-2xl font-bold text-white">Ksh{item.price}</span>
+                                            {/* <span className="text-indigo-300 text-xs lg:text-sm">{item.items} Items</span> */}
                                         </div>
                                     </div>
                                 </div>
@@ -343,23 +330,128 @@ const CartContent: React.FC<{
 }> = ({ cart, updateQuantity, getTotal, getServiceCharge, getTax, getGrandTotal, setShowCart, setCart, isMobile = false }) => {
 
     const [loading, setLoading] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+
+
+    // Add this function to format phone numbers
+    const formatPhoneNumber = (phone: string) => {
+        // Remove all non-digit characters
+        const cleanPhone = phone.replace(/\D/g, '');
+
+        // Handle different formats
+        if (cleanPhone.startsWith('254')) {
+            // Already in correct format (254XXXXXXXXX)
+            return cleanPhone;
+        } else if (cleanPhone.startsWith('07') || cleanPhone.startsWith('01')) {
+            // Convert 07XXXXXXXX or 01XXXXXXXX to 254XXXXXXXXX
+            return '254' + cleanPhone.substring(1);
+        } else if (cleanPhone.startsWith('7') || cleanPhone.startsWith('1')) {
+            // Convert 7XXXXXXXX or 1XXXXXXXX to 254XXXXXXXXX
+            return '254' + cleanPhone;
+        }
+
+        return cleanPhone;
+    };
+
+    // Add this function to validate phone number
+    const isValidKenyanPhone = (phone: string) => {
+        const formatted = formatPhoneNumber(phone);
+        // Kenyan numbers: 254 + (7XX, 1XX) + 6 more digits = 12 digits total
+        return /^254[71]\d{8}$/.test(formatted);
+    };
+
+    // Update the phone number input handler
+    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setPhoneNumber(value);
+
+        // Optional: Auto-format as user types
+        if (value) {
+            const formatted = formatPhoneNumber(value);
+            if (formatted !== value && formatted.length <= 12) {
+                setPhoneNumber(formatted);
+            }
+        }
+    };
+
 
     const handleMakeOrder = async () => {
-        setLoading(true);
-        // Here you would call your API to make the order
         if (cart.length === 0) {
             toast.error("Your cart is empty!");
             return;
         }
-        toast.success("Order placed successfully!");
-        console.log("Order placed with items:", cart);
-        setLoading(false);
-        // empty the cart 
-        setCart([]);
-        if (setShowCart) setShowCart(false); // Close cart if in mobile view
-        
 
+        // Validate payment method
+        if (!paymentMethod) {
+            toast.error("Please select a payment method!");
+            return;
+        }
+
+        // Validate phone number for M-Pesa
+        if (paymentMethod === 'mpesa' && !isValidKenyanPhone(phoneNumber)) {
+            toast.error("Please enter a valid phone number for M-Pesa payment!");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            let response;
+
+            if (paymentMethod === 'mpesa') {
+                const mpesaOrderData = {
+                    items: cart.map(item => ({
+                        foodId: item._id,
+                        qty: item.quantity
+                    })),
+                    paymentMethod: "mpesa" as const,
+                    customerPhone: formatPhoneNumber(phoneNumber)
+                };
+
+                response = await WaiterRoutes.makeOrderMpesa(mpesaOrderData);
+                toast.success("M-Pesa payment request sent! Please check your phone.");
+
+            } else if (paymentMethod === 'cash') {
+                const cashOrderData = {
+                    items: cart.map(item => ({
+                        foodId: item._id,
+                        qty: item.quantity
+                    })),
+                    paymentMethod: "cash" as const
+                };
+
+                response = await WaiterRoutes.makeOrderCash(cashOrderData);
+                toast.success("Cash order placed successfully! Please pay at the counter.");
+            }
+
+            console.log("Order response:", response);
+            console.log("Order placed with items:", cart);
+
+            // Clear cart and close cart view
+            setCart([]);
+            // setShowCart(false);
+
+            // Reset payment form
+            setPaymentMethod('');
+            setPhoneNumber('');
+
+        } catch (error: any) {
+            console.error("Order failed:", error);
+
+            // Handle API error responses
+            const errorMessage = error?.response?.data?.message ||
+                error?.response?.data?.error ||
+                "Order failed. Please try again.";
+
+            toast.error(errorMessage);
+
+        } finally {
+            setLoading(false);
+        }
     };
+
+
     return (
         <>
             {/* Cart Header - Desktop only */}
@@ -382,7 +474,7 @@ const CartContent: React.FC<{
             {/* Cart Items */}
             <div className={`flex-1 overflow-y-auto p-4 lg:p-6 space-y-3 lg:space-y-4 ${isMobile ? 'max-h-60' : ''}`}>
                 {cart.map((item) => (
-                    <div key={item.id} className="bg-indigo-700/30 rounded-xl p-3 lg:p-4">
+                    <div key={item._id} className="bg-indigo-700/30 rounded-xl p-3 lg:p-4">
                         <div className="flex items-start space-x-3">
                             <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center">
                                 <span className="text-lg lg:text-xl">🍔</span>
@@ -393,12 +485,12 @@ const CartContent: React.FC<{
                                     <p className="text-indigo-300 text-xs lg:text-sm">Extra Sauce...</p>
                                 )}
                                 <div className="flex items-center justify-between mt-2">
-                                    <span className="text-white font-bold text-sm lg:text-base">${item.price}</span>
+                                    <span className="text-white font-bold text-sm lg:text-base">Ksh{item.price}</span>
                                     <div className="flex items-center space-x-2 bg-indigo-600/50 rounded-lg">
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                updateQuantity(item.id, item.quantity - 1);
+                                                updateQuantity(item._id, item.quantity - 1);
                                             }}
                                             className="p-1 text-white hover:bg-indigo-500 rounded active:scale-95"
                                         >
@@ -408,7 +500,7 @@ const CartContent: React.FC<{
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                updateQuantity(item.id, item.quantity + 1);
+                                                updateQuantity(item._id, item.quantity + 1);
                                             }}
                                             className="p-1 text-white hover:bg-indigo-500 rounded active:scale-95"
                                         >
@@ -427,7 +519,7 @@ const CartContent: React.FC<{
                 <div className="space-y-2 lg:space-y-3 mb-4">
                     <div className="flex justify-between text-white text-sm lg:text-base">
                         <span>Total</span>
-                        <span>${getTotal().toFixed(2)}</span>
+                        <span>Ksh{getTotal().toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-indigo-300 text-sm lg:text-base">
                         <span>Discount</span>
@@ -435,28 +527,91 @@ const CartContent: React.FC<{
                     </div>
                     <div className="flex justify-between text-indigo-300 text-sm lg:text-base">
                         <span>Service Charge</span>
-                        <span>${getServiceCharge().toFixed(2)}</span>
+                        <span>Ksh{getServiceCharge().toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-indigo-300 text-sm lg:text-base">
                         <span>Tax</span>
-                        <span>${getTax().toFixed(2)}</span>
+                        <span>Ksh{getTax().toFixed(2)}</span>
                     </div>
                     <div className="h-px bg-indigo-700/50"></div>
                     <div className="flex justify-between text-white font-bold text-lg">
                         <span>Grand Total</span>
-                        <span>${getGrandTotal().toFixed(2)}</span>
+                        <span>Ksh{getGrandTotal().toFixed(2)}</span>
                     </div>
                 </div>
 
+                {/* Payment Method Selection */}
+                <div className="mb-4">
+                    <label className="block text-white text-sm font-medium mb-2">
+                        Payment Method
+                    </label>
+                    <select
+                        value={paymentMethod}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        className="w-full bg-indigo-800/50 border border-indigo-600 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+                    >
+                        <option value="">Select payment method</option>
+                        <option value="mpesa">M-Pesa</option>
+                        <option value="cash">Cash</option>
+                    </select>
+
+                    {/* M-Pesa Phone Number Input */}
+                    {paymentMethod === 'mpesa' && (
+                        <div className="mt-3">
+                            <label className="block text-white text-sm font-medium mb-2">
+                                M-Pesa Phone Number
+                            </label>
+                            <input
+                                type="tel"
+                                value={phoneNumber}
+                                onChange={handlePhoneChange}
+                                placeholder="Customer's phone number"
+                                className={`w-full bg-indigo-800/50 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent placeholder-indigo-300 ${phoneNumber && !isValidKenyanPhone(phoneNumber)
+                                    ? 'border-red-500 text-red-300'
+                                    : 'border-indigo-600 text-white'
+                                    }`}
+                            />
+                            <div className="mt-1">
+                                <p className="text-indigo-300 text-xs">
+                                    Accepted formats: 254712345678, 0712345678, 712345678
+                                </p>
+                                {phoneNumber && !isValidKenyanPhone(phoneNumber) && (
+                                    <p className="text-red-400 text-xs mt-1">
+                                        Please enter a valid Kenyan phone number
+                                    </p>
+                                )}
+                                {phoneNumber && isValidKenyanPhone(phoneNumber) && (
+                                    <p className="text-green-400 text-xs mt-1">
+                                        ✓ STK Push Will be sent to: {formatPhoneNumber(phoneNumber)}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
                 <div className="flex space-x-3">
-                    <button className="flex-1 bg-yellow-400 text-gray-800 font-semibold py-3 rounded-lg hover:bg-yellow-300 transition-colors active:scale-95 text-sm lg:text-base">
+                    {/* <button className="flex-1 bg-yellow-400 text-gray-800 font-semibold py-3 rounded-lg hover:bg-yellow-300 transition-colors active:scale-95 text-sm lg:text-base">
                         Save
-                    </button>
-                    <button
-                        onClick={handleMakeOrder}
-                        className="flex-1 bg-green-500 text-white font-semibold py-3 rounded-lg hover:bg-green-600 transition-colors active:scale-95 text-sm lg:text-base">
-                        Order Now
-                    </button>
+                    </button> */}
+                    {
+                        loading ? (
+                            <button className="flex-1 bg-indigo-600 text-white font-semibold py-3 rounded-lg opacity-50 cursor-not-allowed">
+                                Processing...
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handleMakeOrder}
+                                disabled={!paymentMethod}
+                                className={`flex-1 font-semibold py-3 rounded-lg transition-colors active:scale-95 text-sm lg:text-base ${!paymentMethod
+                                    ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
+                                    : 'bg-green-500 text-white hover:bg-green-600'
+                                    }`}
+                            >
+                                Order Now
+                            </button>
+                        )
+                    }
                 </div>
             </div>
         </>

@@ -4,7 +4,7 @@ class WaiterRoutes {
     // menu 
     async getMenu() {
         try {
-            const response = await authenticatedInstance.get("/api/waiter/menu");
+            const response = await authenticatedInstance.get("/api/food");
             return response.data;
         } catch (error) {
             console.error('Failed to fetch menu:', error);
@@ -23,9 +23,9 @@ class WaiterRoutes {
 
     // orders 
     async makeOrderMpesa(data: {
-        items: { foodId: string, quantity: number }[],
+        items: { foodId: string, qty: number }[],
         paymentMethod: "mpesa",
-        phoneNumber: string,
+        customerPhone: string,
     }) {
         try {
             const response = await authenticatedInstance.post("/api/orders", data);
@@ -36,7 +36,7 @@ class WaiterRoutes {
         }
     }
     async makeOrderCash(data: {
-        items: { foodId: string, quantity: number }[],
+        items: { foodId: string, qty: number }[],
         paymentMethod: "cash",
     }) {
         try {
@@ -48,3 +48,6 @@ class WaiterRoutes {
         }
     }
 }
+
+
+export default new WaiterRoutes();
